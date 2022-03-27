@@ -7,6 +7,7 @@ public class PlayerAnimatorController : MonoBehaviour
 {
     private Animator animator;
     private static readonly int MovementSpeed = Animator.StringToHash("movementSpeed");
+    private static readonly int Reload = Animator.StringToHash("onReload");
 
     private void Awake()
     {
@@ -20,8 +21,18 @@ public class PlayerAnimatorController : MonoBehaviour
         get => animator.GetFloat(MovementSpeed);
     }
 
+    public void OnReload()
+    {
+        animator.SetTrigger(Reload);
+    }
+
     public void Play(string stateName, int layer, float normalizedTime)
     {
         animator.Play(stateName, layer, normalizedTime);
+    }
+
+    public bool CurrentAnimationIs(string _name)
+    {
+        return animator.GetCurrentAnimatorStateInfo(0).IsName(_name);
     }
 }
