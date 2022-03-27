@@ -8,6 +8,7 @@ public class PlayerAnimatorController : MonoBehaviour
     private Animator animator;
     private static readonly int MovementSpeed = Animator.StringToHash("movementSpeed");
     private static readonly int Reload = Animator.StringToHash("onReload");
+    private static readonly int IsAimMode = Animator.StringToHash("isAimMode");
 
     private void Awake()
     {
@@ -24,6 +25,13 @@ public class PlayerAnimatorController : MonoBehaviour
     public void OnReload()
     {
         animator.SetTrigger(Reload);
+    }
+    
+    // Assault Riffle 마우스 오른쪽 클릭 액션 (default/aim mode)
+    public bool AimModeIs
+    {
+        set => animator.SetBool(IsAimMode, value);
+        get => animator.GetBool(IsAimMode);
     }
 
     public void Play(string stateName, int layer, float normalizedTime)
