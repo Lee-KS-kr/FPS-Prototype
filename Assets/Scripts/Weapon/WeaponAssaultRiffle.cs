@@ -254,6 +254,15 @@ public class WeaponAssaultRiffle : MonoBehaviour
         if (Physics.Raycast(bulletSpawnPoint.position, attackDirection, out hit, weaponSetting.attackDistance))
         {
             impactMemoryPool.SpawnImpact(hit);
+
+            if (hit.transform.CompareTag($"ImpactEnemy"))
+            {
+                hit.transform.GetComponent<EnemyFSM>().TakeDamage(weaponSetting.damage);
+            }
+            else if (hit.transform.CompareTag($"InteractionObject"))
+            {
+                hit.transform.GetComponent<InteractionObjects>().TakeDamage(weaponSetting.damage);
+            }
         }
         Debug.DrawRay(bulletSpawnPoint.position, attackDirection*weaponSetting.attackDistance, Color.blue);
     }
@@ -291,5 +300,12 @@ public class WeaponAssaultRiffle : MonoBehaviour
         isReload = false;
         isAttack = false;
         isModeChange = false;
+    }
+
+    public void IncreaseMagazine(int magazine)
+    {
+        weaponSetting.currentMagazine =
+            CurrentMagazine + magazine > MaxMagazine ? MaxMagazine : CurrentMagazine + magazine;
+        onMagazineEvent.Invoke(CurrentMagazine);
     }
 }

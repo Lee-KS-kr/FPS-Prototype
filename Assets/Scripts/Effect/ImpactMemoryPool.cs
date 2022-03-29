@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum ImpactType
 {
-    Normal = 0, Obstacle, 
+    Normal = 0, Obstacle, Enemy, InteractionObject,
 }
 public class ImpactMemoryPool : MonoBehaviour
 {
@@ -35,13 +35,28 @@ public class ImpactMemoryPool : MonoBehaviour
         {
             OnSpawnImpact(ImpactType.Obstacle, hit.point, Quaternion.LookRotation(hit.normal));
         }
+        else if (hit.transform.CompareTag($"ImpactEnemy"))
+        {
+            OnSpawnImpact(ImpactType.Enemy, hit.point, Quaternion.LookRotation(hit.normal));
+        }
+        else if (hit.transform.CompareTag($"InteractionObject"))
+        {
+            Color color = hit.transform.GetComponent<MeshRenderer>().material.color;
+            OnSpawnImpact(ImpactType.InteractionObject, hit.point, Quaternion.LookRotation(hit.normal), color);
+        }
     }
 
-    public void OnSpawnImpact(ImpactType type, Vector3 position, Quaternion rotation)
+    public void OnSpawnImpact(ImpactType type, Vector3 position, Quaternion rotation, Color color = new Color())
     {
         GameObject item = memoryPool[(int) type].ActivePoolItem();
         item.transform.position = position;
         item.transform.rotation = rotation;
         item.GetComponent<Impact>().Setup(memoryPool[(int)type]);
+
+        if (type == ImpactType.InteractionObject)
+        {
+            ParticleSystem.MainModule main = item.GetComponent<ParticleSystem>().main;
+            main.startColor = color;
+        }
     }
 }
