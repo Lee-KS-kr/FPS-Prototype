@@ -10,19 +10,24 @@ using UnityEngine.Serialization;
 public class PlayerHUD : MonoBehaviour
 {
     [Header("Components")] [SerializeField]
-    private WeaponAssaultRiffle weapon; // 현재 정보가 출력되는 무기
-    [SerializeField] private Status status; // 플레이어의 상태(이동속도, 체력)
+    // private WeaponAssaultRiffle weapon; // 현재 정보가 출력되는 무기
+    private WeaponBase weapon; // 현재 정보가 출력되는 무기
+
+    [Header("Components")] [SerializeField]
+    private Status status; // 플레이어의 상태(이동속도, 체력)
 
     [Header("Weapon Base")] [SerializeField]
     private TextMeshProUGUI textWeaponName; // 무기 이름
     [SerializeField] private Image imageWeaponIcon; // 무기 아이콘
     [SerializeField] private Sprite[] spriteWeaponIcons; // 무기 아이콘에 사용되는 sprite 배열
+    [SerializeField] private Vector2[] sizeWeaponIcons; // 무기 아이콘의 UI 크기 배열
 
     [Header("Ammo")] [SerializeField] private TextMeshProUGUI textAmmo; // 현재/최대 탄 수 출력 text
 
     [Header("Magazine")] [SerializeField] 
     private GameObject magazineUIPrefab; // 탄창 UI 프리펩
     [SerializeField] private Transform magazineParent; // 탄창 UI가 배치되는 Panel
+    [SerializeField] private int maxMagazineCount;  // 처음 생성하는 최대 탄창 수
 
     private List<GameObject> magazineList; // 탄창 UI 리스트
 
@@ -33,20 +38,39 @@ public class PlayerHUD : MonoBehaviour
 
     private void Awake()
     {
-        SetupWeapon();
-        SetupMagazine();
+        // SetupWeapon();
+        // SetupMagazine();
         
         // 메소드가 등록되어 있는 이벤트 클래스(weapon.xx)의
         // Invoke() 메소드가 호출될 때 등록된 메소드(매개변수)가 실행된다
-        weapon.onAmmoEvent.AddListener(UpdateAmmoHUD);
-        weapon.onMagazineEvent.AddListener(UpdateMagazineHUD);
+        // weapon.onAmmoEvent.AddListener(UpdateAmmoHUD);
+        // weapon.onMagazineEvent.AddListener(UpdateMagazineHUD);
         status.onHPEvent.AddListener(UpdateHPHUD);
+    }
+
+    public void SetupAllWeapons(WeaponBase[] weapons)
+    {
+        SetupMagazine();
+        
+        // 사용 가능한 모든 무기의 이벤트 등록
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            weapons[i].onAmmoEvent.AddListener(UpdateAmmoHUD);
+            weapons[i].onMagazineEvent.AddListener(UpdateMagazineHUD);
+        }
+    }
+
+    public void SwitchingWeapon(WeaponBase newWeapon)
+    {
+        weapon = newWeapon;
+        SetupWeapon();
     }
 
     private void SetupWeapon()
     {
         textWeaponName.text = weapon.WeaponName.ToString();
         imageWeaponIcon.sprite = spriteWeaponIcons[(int) weapon.WeaponName];
+        imageWeaponIcon.rectTransform.sizeDelta = sizeWeaponIcons[(int) weapon.WeaponName];
     }
 
     private void UpdateAmmoHUD(int currentAmmo, int maxAmmo)
@@ -68,11 +92,11 @@ public class PlayerHUD : MonoBehaviour
             magazineList.Add(clone);
         }
         
-        // weapon에 등록되어 있는 현재 탄창 개수만큼 오브젝트 활성화
-        for (int i = 0; i < weapon.CurrentMagazine; ++i)
-        {
-            magazineList[i].SetActive(true);
-        }
+        // // weapon에 등록되어 있는 현재 탄창 개수만큼 오브젝트 활성화
+        // for (int i = 0; i < weapon.CurrentMagazine; ++i)
+        // {
+        //     magazineList[i].SetActive(true);
+        // }
     }
 
     private void UpdateMagazineHUD(int currentMagazine)

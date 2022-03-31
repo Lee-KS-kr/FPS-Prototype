@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 public enum WeaponName
 {
-    AssaultRiffle = 0
+    AssaultRiffle = 0, Revolver, CombatKnife, HandGrenade,
 }
 
 [System.Serializable]
